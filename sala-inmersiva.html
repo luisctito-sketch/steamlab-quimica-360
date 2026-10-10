@@ -1,0 +1,63 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>STEAMLab · Aula molecular inmersiva 360°</title><style>
+*{box-sizing:border-box}html,body{margin:0;background:#020914;color:#ecfaff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}body{overflow-x:hidden}.top{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:9px 16px;background:#07192d;border-bottom:1px solid #294560}.top strong{font-size:14px}.top small{font-size:11px;color:#9cc1d8}.bar{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;padding:8px;background:#092038;border-bottom:1px solid #274b69}button,select{background:#204363;border:1px solid #47789c;color:#f1fbff;border-radius:8px;padding:8px 10px;font:600 12px system-ui;cursor:pointer}button.primary{background:#10c8dc;color:#00222d}label{font-size:12px;color:#cce9f8}.view{position:relative;margin:0 auto;width:100%;max-width:1800px;aspect-ratio:16/9;overflow:hidden;background:#020b19}canvas{display:block;width:100%;height:100%}.hud{position:absolute;left:12px;top:12px;padding:9px 12px;background:#071b30a8;border:1px solid #67cbdf65;border-radius:10px;pointer-events:none;max-width:58%;text-shadow:0 2px 5px #001}.hud b{font-size:clamp(10px,1.6vw,20px)}.hud p{margin:3px 0 0;color:#bbdeed;font-size:clamp(9px,1vw,13px)}.credits{font-size:12px;color:#bad6e8;text-align:center;padding:9px 12px}.hint{display:none;text-align:center;padding:8px;background:#342c14;color:#fff1b6;font-size:12px}body.landscape-needed .hint{display:block}a{color:#9debf8}body:fullscreen .top,body:fullscreen .bar,body:fullscreen .credits{display:none}body:fullscreen .view{width:100vw;height:100vh;max-width:none;aspect-ratio:auto}body:fullscreen{overflow:hidden}@media(max-width:700px){.top{padding:6px 10px}.top strong{font-size:12px}.top small{font-size:10px}.bar{padding:5px;gap:4px}.bar button,.bar select{padding:6px;font-size:11px}.hud{top:5px;left:6px;padding:5px}.credits{padding:5px;font-size:10px}}
+</style></head><body>
+<div class="top"><div><strong>STEAMLab · Laboratorio molecular inmersivo</strong><br><small>Cuaderno 09 · Química universitaria · Sala abierta de cinco superficies</small></div><small>Proyección virtual 3 paredes + techo + piso</small></div>
+<div class="bar"><label>Moléculas: <select id="mol"><option value="todas">Todas</option><option value="agua">H₂O · Agua</option><option value="co2">CO₂ · Dióxido de carbono</option><option value="metano">CH₄ · Metano</option><option value="amoniaco">NH₃ · Amoníaco</option></select></label><label>Velocidad <input id="speed" type="range" min="0" max="2" step=".1" value="1" style="width:70px;vertical-align:middle;accent-color:#19e5f8"></label><button id="pause">Pausar</button><button id="rays">Rayos: sí</button><button id="benches">Mesas: sí</button><button class="primary" id="full">Pantalla completa</button><a href="./index.html" style="font-size:12px">Inicio</a></div>
+<div class="hint">Gira el celular a posición horizontal para ver toda el aula.</div>
+<section class="view"><canvas id="room" aria-label="Aula química animada con moléculas sobre paredes, techo y piso"></canvas><div class="hud"><b>ARQUITECTURA MOLECULAR INMERSIVA</b><p>¿Cómo se relacionan geometría y polaridad?</p></div></section>
+<div class="credits">Modelo artístico didáctico, no movimiento molecular real ni diseño de un proyector físico de 350° · La cuarta pared está abierta para observar el aula.</div>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('room'),c=canvas.getContext('2d',{alpha:false});let W=1280,H=720,DPR=1,t=0,prev=0,paused=false,beams=true,benches=true;
+const mols={agua:{name:'H₂O',atoms:[['O',0,0,0],['H',-.9,-.58,0],['H',.9,-.58,0]],bonds:[[0,1],[0,2]],angle:'104,5°',polar:'POLAR'},co2:{name:'CO₂',atoms:[['O',-1.1,0,0],['C',0,0,0],['O',1.1,0,0]],bonds:[[0,1],[1,2]],angle:'180°',polar:'APOLAR'},metano:{name:'CH₄',atoms:[['C',0,0,0],['H',-.65,-.7,.65],['H',.65,.7,.65],['H',.65,-.7,-.65],['H',-.65,.7,-.65]],bonds:[[0,1],[0,2],[0,3],[0,4]],angle:'109,5°',polar:'APOLAR'},amoniaco:{name:'NH₃',atoms:[['N',0,.45,0],['H',-.9,-.5,0],['H',.45,-.5,.77],['H',.45,-.5,-.77]],bonds:[[0,1],[0,2],[0,3]],angle:'107°',polar:'POLAR'}};
+const keys=['agua','co2','metano','amoniaco'],atomColor={O:'#ff536a',H:'#e8f7ff',C:'#a2b1c5',N:'#608dff'};
+let seed=91;function rnd(){seed=(1664525*seed+1013904223)>>>0;return seed/4294967296}const sparks=Array.from({length:110},()=>({x:(rnd()-.5)*8.7,y:rnd()*5,z:-7.9+rnd()*7,r:0.4+rnd()*1.5,ph:rnd()*6.28}));
+function resize(){const box=canvas.getBoundingClientRect();DPR=Math.min(window.devicePixelRatio||1,1.8);W=Math.round(box.width*DPR);H=Math.round(box.height*DPR);canvas.width=W;canvas.height=H;document.body.classList.toggle('landscape-needed',innerHeight>innerWidth&&innerWidth<740)}window.addEventListener('resize',resize);window.addEventListener('orientationchange',resize);resize();
+// 3D room with front wall removed, virtual camera (0,2.25,11.4)
+function P(p){let [x,y,z]=p;const vz=11.4-z;const f=Math.min(W/14.9,H/8.15)*10.4;return [W/2+x*f/vz,H/2+(2.65-y)*f/vz,f/vz]}
+function poly(points,fill,stroke,lw=1){c.beginPath();points.forEach((p,i)=>{const q=P(p);i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])});c.closePath();c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=lw*DPR;c.stroke()}}
+function line(A,B,col,w=1){const a=P(A),b=P(B);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.strokeStyle=col;c.lineWidth=w*DPR;c.stroke()}
+function circle3(p,r,color,glow=0){const q=P(p);const rad=Math.max(1,q[2]*r);c.shadowColor=color;c.shadowBlur=glow*DPR;c.beginPath();c.arc(q[0],q[1],rad,0,Math.PI*2);c.fillStyle=color;c.fill();c.shadowBlur=0}
+function polygonScreen(points,fill){c.beginPath();points.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fillStyle=fill;c.fill()}
+function drawRoom(){const bg=c.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#020712');bg.addColorStop(.7,'#061b33');bg.addColorStop(1,'#102840');c.fillStyle=bg;c.fillRect(0,0,W,H);
+poly([[-5.6,0,-8],[5.6,0,-8],[5.6,5.5,-8],[-5.6,5.5,-8]],'#082344','#21659d',1.3);
+poly([[-5.6,0,3],[-5.6,0,-8],[-5.6,5.5,-8],[-5.6,5.5,3]],'#071a36','#2668a4',1.3);
+poly([[5.6,0,-8],[5.6,0,3],[5.6,5.5,3],[5.6,5.5,-8]],'#0b1933','#2668a4',1.3);
+poly([[-5.6,5.5,-8],[5.6,5.5,-8],[5.6,5.5,3],[-5.6,5.5,3]],'#07172f','#235da2',1.3);
+poly([[-5.6,0,3],[5.6,0,3],[5.6,0,-8],[-5.6,0,-8]],'#071731','#2870b0',1.3);
+// technological grid-lines adapted to surfaces
+for(let i=1;i<9;i++){let z=3-i*1.18;line([-5.6,0,z],[5.6,0,z],'#1a8ac927',.8);line([-5.6,5.5,z],[5.6,5.5,z],'#225ec322',.7)}
+for(let x=-5;x<=5;x+=1.15){line([x,0,-8],[x,0,3],'#2f90de1c',.6);line([x,5.5,-8],[x,5.5,3],'#2e72e21c',.6)}
+for(let y=.7;y<5.5;y+=1){line([-5.6,y,-8],[5.6,y,-8],'#3082d61e',.5)}
+}
+function molecule(key,center,surface,scale,ph,alpha=1){const m=mols[key], a=t*.4+ph, b=t*.56+ph*.7;let mapped=[];for(let [e,x,y,z] of m.atoms){let X=x*Math.cos(a)-z*Math.sin(a),Z=x*Math.sin(a)+z*Math.cos(a),Y=y*Math.cos(b)-Z*Math.sin(b),ZZ=y*Math.sin(b)+Z*Math.cos(b);let dx=X*scale,dy=Y*scale,dz=ZZ*scale;
+const [cx,cy,cz]=center;let out= surface==='back'?[cx+dx,cy+dy,cz+.12]:surface==='left'?[cx+.12,cy+dy,cz+dx]:surface==='right'?[cx-.12,cy+dy,cz-dx]:surface==='top'?[cx+dx,cy-.12,cz+dy]:[cx+dx,cy+.12,cz+dy];mapped.push([e,out])}
+// blue glow around molecule, all geometries projected onto corresponding surface
+const q=P(center);const radius=Math.max(10,scale*88*DPR*q[2]);const halo=c.createRadialGradient(q[0],q[1],0,q[0],q[1],radius);halo.addColorStop(0,`rgba(20,140,252,${.22*alpha})`);halo.addColorStop(1,'rgba(20,120,240,0)');c.fillStyle=halo;c.fillRect(q[0]-radius,q[1]-radius,2*radius,2*radius);
+c.globalAlpha=alpha;m.bonds.forEach(([i,j])=>line(mapped[i][1],mapped[j][1],'#adf5ff',Math.max(1,scale*5*P(center)[2]/DPR)));for(const [el,p] of mapped)circle3(p,scale*(el==='H'?12:17)*DPR,atomColor[el],5);
+c.globalAlpha=1;
+}
+function drawMolecules(){let sel=document.getElementById('mol').value;const key=(i)=>sel==='todas'?keys[i%4]:sel;const specs=[];
+for(let i=0;i<12;i++){const u=(i%4+.5)/4,v=(Math.floor(i/4)+.5)/3;specs.push([key(i),[-4.7+u*9.4,.7+v*4.3,-7.88],'back',.35+(i%3)*.08,i]);}
+for(let i=0;i<10;i++){const z=-6.8+(i%5)*1.58,y=1.1+Math.floor(i/5)*2.25;specs.push([key(i+1),[-5.48,y,z],'left',.30+(i%2)*.08,i+.8]);specs.push([key(i+2),[5.48,y,z],'right',.30+(i%2)*.08,i+1.2]);}
+for(let i=0;i<10;i++){const x=-4.3+(i%5)*2.1,z=-6.9+Math.floor(i/5)*4.2;specs.push([key(i+3),[x,5.38,z],'top',.35,i+2]);specs.push([key(i+1),[x,.10,z],'floor',.32,i+3]);}
+// on each plane very gentle drift, still anchored to walls/ceiling/floor
+specs.forEach(([k,p,s,sc,ph],idx)=>{const a=t*.45+ph, pp=[...p];if(s==='back') {pp[0]+=.17*Math.sin(a);pp[1]+=.14*Math.cos(a)}if(s==='left'||s==='right'){pp[2]+=.15*Math.sin(a);pp[1]+=.13*Math.cos(a)}if(s==='top'||s==='floor'){pp[0]+=.16*Math.sin(a);pp[2]+=.16*Math.cos(a)}molecule(k,pp,s,sc,ph,.8)})}
+function box3(x1,y1,z1,x2,y2,z2){poly([[x1,y2,z1],[x2,y2,z1],[x2,y2,z2],[x1,y2,z2]],'#1c3950','#508ba3',.5);poly([[x1,y1,z1],[x2,y1,z1],[x2,y2,z1],[x1,y2,z1]],'#102639','#37749b',.6);poly([[x2,y1,z1],[x2,y1,z2],[x2,y2,z2],[x2,y2,z1]],'#0b2035','#427c9b',.5)}
+function drawBenches(){if(!benches)return;for(const s of [-1,1]){for(let i=0;i<3;i++){const z=-6.7+i*2.28,x=s*4.95;box3(x-.58,0,z-.72,x+.58,.88,z+.72);
+// glass flask and apparatus above each bench
+const xx=x+(-s)*.12, zz=z;line([xx,.9,zz],[xx,1.45,zz],'#87dbec',1.8);circle3([xx,1.33,zz],11*DPR,i%2?'#5ae4f5':'#e77dff',6);line([x-.28,1.08,zz-.25],[x+.3,1.08,zz-.25],'#8aa8ba',1.3)}}}
+function drawProjector(){const p=[0,.67,-.8]; // physical simulated projection unit
+poly([[-.55,.27,-1.4],[.55,.27,-1.4],[.55,.27,-.35],[-.55,.27,-.35]],'#19334b','#51adff',1.5);
+box3(-.39,.29,-1.2,.39,.79,-.4);circle3([0,.87,-.8],24*DPR,'#6fe3ff',20);
+// subtle rotating luminous ring, viewed around the projector
+const dots=56;for(let i=0;i<dots;i++){const a=i/dots*Math.PI*2+t*.7;circle3([Math.cos(a)*.8,.84, -.8+Math.sin(a)*.8],2.5*DPR,'#6de9ff',3)}
+if(beams){const dest=[[0,3,-7.9],[-5.4,3,-3],[5.4,3,-3],[0,5.42,-2],[0,.10,-4.5]];
+for(let i=0;i<dest.length;i++){const d=dest[i],a=P([0,.87,-.8]),b=P(d);const g=c.createLinearGradient(a[0],a[1],b[0],b[1]);g.addColorStop(0,'rgba(69,184,255,.47)');g.addColorStop(1,'rgba(40,156,255,.03)');c.strokeStyle=g;c.lineWidth=(1.0+Math.sin(t*2+i)*.35)*2*DPR;c.beginPath();c.moveTo(...a.slice(0,2));c.lineTo(...b.slice(0,2));c.stroke();}}
+}
+function drawSparks(){for(const s of sparks){let p=[s.x,s.y+.05*Math.sin(t*2+s.ph),s.z], q=P(p);c.fillStyle=`rgba(85,200,255,${.12+.12*Math.sin(t*1.3+s.ph)})`;c.beginPath();c.arc(q[0],q[1],s.r*DPR,0,7);c.fill()}}
+function frame(now){const dt=Math.min(.05,(now-prev)/1000||0);prev=now;if(!paused)t+=dt*Number(document.getElementById('speed').value);
+c.save();drawRoom();drawSparks();drawMolecules();drawBenches();drawProjector();c.restore();requestAnimationFrame(frame)}requestAnimationFrame(frame);
+document.getElementById('pause').onclick=()=>{paused=!paused;document.getElementById('pause').textContent=paused?'Reanudar':'Pausar'};document.getElementById('rays').onclick=()=>{beams=!beams;document.getElementById('rays').textContent='Rayos: '+(beams?'sí':'no')};document.getElementById('benches').onclick=()=>{benches=!benches;document.getElementById('benches').textContent='Mesas: '+(benches?'sí':'no')};document.getElementById('full').onclick=async()=>{try{await document.documentElement.requestFullscreen();try{await screen.orientation.lock('landscape')}catch(e){} }catch(e){alert('Gira el celular horizontalmente; pantalla completa no disponible en este navegador.')}};
+})();
+</script></body></html>
