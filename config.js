@@ -1,0 +1,8 @@
+export const MOLECULAS = {
+ agua:{nombre:'Agua', formula:'H₂O', vsepr:'AX₂E₂ · angular', angulo:'≈104,5°', polar:'Polar', explicacion:'Dos enlaces O–H y dos pares libres del oxígeno. Los dipolos de enlace no se cancelan.', atomos:[{e:'O',p:[0,0,0]},{e:'H',p:[-1.03,.10,.60]},{e:'H',p:[.27,.10,-1.16]}],enlaces:[[0,1],[0,2]],col:'#68ddff'},
+ co2:{nombre:'Dióxido de carbono',formula:'CO₂',vsepr:'AX₂ · lineal',angulo:'180°',polar:'Apolar',explicacion:'Los dos enlaces C=O son polares pero sus dipolos se cancelan por simetría lineal.',atomos:[{e:'C',p:[0,0,0]},{e:'O',p:[-1.18,0,0]},{e:'O',p:[1.18,0,0]}],enlaces:[[0,1],[0,2]],col:'#ffc978'},
+ metano:{nombre:'Metano',formula:'CH₄',vsepr:'AX₄ · tetraédrica',angulo:'≈109,5°',polar:'Apolar',explicacion:'Los cuatro enlaces C–H se disponen con simetría tetraédrica; el momento dipolar neto es nulo.',atomos:[{e:'C',p:[0,0,0]},{e:'H',p:[.95,.95,.95]},{e:'H',p:[-.95,-.95,.95]},{e:'H',p:[-.95,.95,-.95]},{e:'H',p:[.95,-.95,-.95]}],enlaces:[[0,1],[0,2],[0,3],[0,4]],col:'#9af9b0'},
+ amoniaco:{nombre:'Amoníaco',formula:'NH₃',vsepr:'AX₃E · piramidal trigonal',angulo:'≈107°',polar:'Polar',explicacion:'El nitrógeno tiene tres enlaces N–H y un par libre; la geometría piramidal genera un dipolo neto.',atomos:[{e:'N',p:[0,.55,0]},{e:'H',p:[1,-.38,0]},{e:'H',p:[-.5,-.38,.866]},{e:'H',p:[-.5,-.38,-.866]}],enlaces:[[0,1],[0,2],[0,3]],col:'#dfb3ff'}
+};
+export const CARAS=['frente','derecha','fondo','izquierda','techo','piso'];
+export const TITULOS={frente:'Pared frontal · identidad',derecha:'Pared derecha · enlaces',fondo:'Pared posterior · simetría',izquierda:'Pared izquierda · polaridad',techo:'Techo · geometría espacial',piso:'Piso · huellas y trayectoria'};
