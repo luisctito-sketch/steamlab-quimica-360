@@ -13,3 +13,6 @@ Sube todos los archivos de este ZIP a la raíz de tu repositorio actual `steamla
 
 ## Alcance
 Esta aplicación **simula visualmente** desde un monitor una sala de tres paredes, techo y piso. No controla proyectores físicos ni constituye un sistema de projection mapping. Los haces de luz y el dispositivo central forman parte de la representación artística, con capas animadas.
+
+## Actualización de enlace
+El botón **ENTRAR AL AULA INMERSIVA ANIMADA** de `index.html` lleva a `sala-animada-v2.html?v=20261010`, nombre nuevo que evita reutilizar el HTML celeste anterior almacenado en caché. Se conserva `sala-inmersiva.html` como ruta alternativa y se debe subir `laboratorio-fondo.png` junto a los HTML.
