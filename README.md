@@ -1,21 +1,15 @@
-# STEAMLab — Sala molecular inmersiva animada
+# STEAMLab Química 360° — sala animada V2
 
-Actualización compatible con el repositorio público `steamlab-quimica-360`.
+En GitHub Pages, abre `sala-inmersiva.html`. Esta página usa **laboratorio-fondo.png** como escenario 16:9 real y superpone moléculas giratorias sobre tres paredes, techo y piso, además de partículas luminosas y cinco haces animados procedentes del equipo central ilustrado.
 
-## Abrir
-- `index.html`: portada con nuevo enlace al aula.
-- `sala-inmersiva.html`: sala **realmente animada** en HTML Canvas, compatible con GitHub Pages.
-- `control.html` y `proyectar.html`: vistas experimentales de proyección independientes anteriores.
+## Publicar
+Sube todos los archivos de este ZIP a la raíz de tu repositorio actual `steamlab-quimica-360`, reemplazando nombres repetidos y agregando `laboratorio-fondo.png`. Activa GitHub Pages con la rama main y root. Abre `https://luisctito-sketch.github.io/steamlab-quimica-360/sala-inmersiva.html?v=2`.
 
-## Uso
-1. Subir y reemplazar en el repositorio los archivos del ZIP, manteniendo la raíz de GitHub Pages.
-2. Abrir `https://TU-USUARIO.github.io/steamlab-quimica-360/sala-inmersiva.html`.
-3. En computadora, usar horizontal 16:9. En celular, girar a horizontal, pulsar Pantalla completa si funciona.
-4. Elegir H₂O, CO₂, CH₄, NH₃ o todas; ajustar velocidad, pausar; activar/desactivar haces luminosos y mesas.
+## Diagnóstico
+- Si falta la imagen verás un aviso, no una pantalla celeste silenciosa. Confirma que `laboratorio-fondo.png` esté junto al HTML y respete mayúsculas/minúsculas.
+- Abre la vista en orientación horizontal y pulsa Pantalla completa.
+- Pulsa Pausar: las moléculas deben detenerse. Cambia el selector para mostrar solo una especie.
+- Los dibujos de moléculas no son simulaciones realistas de trayectorias atómicas ni cambian químicamente.
 
-## Nota importante
-Es una **simulación artística animada de una sala**: moléculas y rayos se mueven en el navegador en superficies virtuales (tres paredes visibles, techo y piso). La pared frontal se omite para observar el interior. El proyector central es una **representación escénica virtual**, no una especificación técnica de un aparato real 350°/360°. No equivale a hacer proyección física 360°, ni afirma que un solo proyector convencional cubra 5 superficies; una instalación real requerirá proyectores apropiados, óptica, distribución de señales y calibración.
-
-Las moléculas son modelos educativos esquemáticos; los átomos no se observan directamente, los colores y tamaños no están a escala y la animación no es dinámica molecular experimental.
-
-Las superficies pueden utilizarse en una propuesta STEAMLab de neuroaprendizaje. Se conserva la cabina de proyección del proyecto inicial.
+## Alcance
+Esta aplicación **simula visualmente** desde un monitor una sala de tres paredes, techo y piso. No controla proyectores físicos ni constituye un sistema de projection mapping. Los haces de luz y el dispositivo central forman parte de la representación artística, con capas animadas.
